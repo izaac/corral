@@ -1,6 +1,6 @@
 name: registry
 description: |
-  An authenticated docker registry running in Digitalocean.
+  An authenticated docker registry running in Linode.
 variables:
   linode_token:
     sensitive: true
@@ -34,6 +34,16 @@ variables:
     type: string
     readOnly: true
     description: "password for registry authentication"
+  valid_cert:
+    type: string
+    # readOnly: true
+    optional: false
+    description: "valid domain certificate"
+  valid_key:
+    type: string
+    # readOnly: true
+    optional: false
+    description: "valid domain certificate key"
 commands:
   - module: main
   - command: /opt/corral/install.sh
