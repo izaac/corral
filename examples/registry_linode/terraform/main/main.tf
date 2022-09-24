@@ -31,7 +31,7 @@ resource "linode_instance" "registry" {
     label = "${var.corral_user_id}-${random_id.registry_id.hex}-registry"
     image = "linode/ubuntu20.04"
     region = "us-east"
-    type = "g6-standard-2"
+    type = "g6-standard-4"
     authorized_keys = [linode_sshkey.corral_key.ssh_key]
     root_pass = var.linode_root_password
 

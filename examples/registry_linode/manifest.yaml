@@ -36,14 +36,16 @@ variables:
     description: "password for registry authentication"
   valid_cert:
     type: string
-    # readOnly: true
     optional: false
     description: "valid domain certificate"
   valid_key:
     type: string
-    # readOnly: true
     optional: false
     description: "valid domain certificate key"
+  rancher_version:
+    type: string
+    optional: false
+    description: "Rancher version that the registry is for"
 commands:
   - module: main
   - command: /opt/corral/install.sh

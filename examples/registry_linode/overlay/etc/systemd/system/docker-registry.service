@@ -9,6 +9,7 @@ RemainAfterExit=true
 WorkingDirectory=/opt/basic-registry/
 ExecStart=/usr/bin/docker-compose up -d --remove-orphans
 ExecStop=/usr/bin/docker-compose down
+ExecStartPost=/usr/bin/timeout 30 sh -c 'while ! ss -H -t -l -n sport = :443 | grep -q "^LISTEN.*:443"; do sleep 1; done'
 
 [Install]
 WantedBy=multi-user.target
