@@ -9,4 +9,5 @@ variable "linode_token" {}
 variable "aws_zone_id" {}
 variable "aws_domain" {}
 variable "linode_root_password" {}
-
+variable "registry_auth" {}
+ 

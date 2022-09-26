@@ -46,6 +46,10 @@ variables:
     type: string
     optional: false
     description: "Rancher version that the registry is for"
+  registry_auth:
+    type: string
+    optional: false
+    description: "Flag to build an auth enabled registry or no auth"
 commands:
   - module: main
   - command: /opt/corral/install.sh
