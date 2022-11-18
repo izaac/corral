@@ -48,8 +48,8 @@ corral_log "Downloading Rancher registry scripts from release"
 wget -O rancher-images.txt "${DOWNLOAD_URL}${CORRAL_rancher_version}"/rancher-images.txt
 wget -O rancher-save-images.sh "${DOWNLOAD_URL}${CORRAL_rancher_version}"/rancher-save-images.sh
 wget -O rancher-load-images.sh "${DOWNLOAD_URL}${CORRAL_rancher_version}"/rancher-load-images.sh
-sed -i '58d' rancher-save-images.sh
-sed -i '76d' rancher-load-images.sh
+sed -i 's/docker save/# docker save /g' rancher-save-images.sh
+sed -i 's/docker load/# docker load /g' rancher-load-images.sh
 chmod +x rancher-save-images.sh 
 chmod +x rancher-load-images.sh
 
