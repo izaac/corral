@@ -1,4 +1,4 @@
-output "corral_rancher_node_pools" {
+output "corral_node_pools" {
   value = {
     rancher = [
     for node in linode_instance.rancher : {
@@ -7,11 +7,6 @@ output "corral_rancher_node_pools" {
       address = node.ip_address
     }
     ]
-  }
-}
-
-output "corral_registry_node_pools" {
-  value = {
     registry = [
     for node in linode_instance.registry : {
       name = node.label
