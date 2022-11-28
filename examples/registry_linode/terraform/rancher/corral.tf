@@ -13,3 +13,4 @@ variable "registry_auth" {}
 variable "rancher_host" {}
 variable "registry_host" {}
 variable "rancher_version" {}
+variable "rancher_password" {}

@@ -46,13 +46,17 @@ variables:
     type: string
     optional: false
     description: "Rancher version that the registry is for"
+  rancher_password:
+    type: string
+    optional: false
+    description: "Rancher password after bootstrap"
   registry_auth:
     type: string
     optional: false
     description: "Flag to build an auth enabled registry or no auth"
   ssh_authorized_key:
     type: string
-    optional: false
+    optional: true
     description: "the public ssh key to copy to the nodes for remote access"
   docker_version:
     type: string
@@ -65,6 +69,6 @@ commands:
     node_pools:
       - registry
   - module: rancher
-  - command: /opt/corral/rancher-install.sh
+  - command: /opt/corral/rancher-info.sh
     node_pools:
       - rancher

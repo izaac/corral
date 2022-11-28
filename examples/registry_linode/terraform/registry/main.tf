@@ -25,6 +25,11 @@ resource "random_id" "rancher_id" {
   byte_length       = 6
 }
 
+resource "linode_sshkey" "corral_public_ssh_key" {
+  label   = "${var.corral_user_id}-${random_id.registry_id.hex}"
+  ssh_key = var.corral_public_key
+}
+
 resource "linode_sshkey" "public_ssh_key" {
   label   = "${var.corral_user_id}-${random_id.registry_id.hex}"
   ssh_key = var.ssh_authorized_key
@@ -36,7 +41,7 @@ resource "linode_instance" "registry" {
     image = "linode/ubuntu20.04"
     region = "us-east"
     type = "g6-standard-4"
-    authorized_keys = [linode_sshkey.public_ssh_key.ssh_key]
+    authorized_keys = [linode_sshkey.corral_public_ssh_key.ssh_key, linode_sshkey.public_ssh_key.ssh_key]
     root_pass = var.linode_root_password
 
     group = "hosted_registry"
@@ -57,6 +62,15 @@ resource "linode_instance" "registry" {
       user = "root"
       password = var.linode_root_password
   }
+
+  provisioner "remote-exec" {
+   inline = [
+       "wget https://releases.rancher.com/install-docker/${var.docker_version}.sh",
+       "chmod +x ${var.docker_version}.sh",
+       "bash ${var.docker_version}.sh",
+       "apt-get install -y apache2-utils docker-compose"
+   ]
+  }
 }
 
 resource "aws_route53_record" "registry" {
@@ -73,7 +87,7 @@ resource "linode_instance" "rancher" {
     image = "linode/ubuntu20.04"
     region = "us-east"
     type = "g6-standard-4"
-    authorized_keys = [linode_sshkey.public_ssh_key.ssh_key]
+    authorized_keys = [linode_sshkey.corral_public_ssh_key.ssh_key, linode_sshkey.public_ssh_key.ssh_key]
     root_pass = var.linode_root_password
 
     group = "hosted_registry"

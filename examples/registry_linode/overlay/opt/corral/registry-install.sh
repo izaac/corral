@@ -18,9 +18,6 @@ echo "$CORRAL_valid_key" | base64 -d > /opt/basic-registry/nginx_config/domain.k
 
 corral_log "Downloading Dependencies"
 
-apt-get update -y
-apt-get install -y apache2-utils docker-compose
-
 if [ "True" = "$CORRAL_registry_auth" ]; then
     corral_log "Building registry with auth"
     
