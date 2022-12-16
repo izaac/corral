@@ -11,6 +11,14 @@ variable "aws_domain" {}
 variable "linode_root_password" {}
 variable "registry_auth" {}
 variable "rancher_host" {}
-variable "registry_host" {}
+variable "registry_global_host" {}
+variable "registry_auth_host" {}
+variable "registry_noauth_host" {}
 variable "rancher_version" {}
 variable "rancher_password" {}
+variable "password" {}
+variable "kubernetes_version" {}
+variable "kubernetes_version_rke1" {}
+variable "docker_version" {}
+variable "ssh_authorized_key" {}
+variable "linode_resource_prefix" {}

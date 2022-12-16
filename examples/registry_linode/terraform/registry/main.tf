@@ -31,13 +31,13 @@ resource "linode_sshkey" "corral_public_ssh_key" {
 }
 
 resource "linode_sshkey" "public_ssh_key" {
-  label   = "${var.corral_user_id}-${random_id.registry_id.hex}"
+  label   = "${var.corral_user_id}-${random_id.rancher_id.hex}"
   ssh_key = var.ssh_authorized_key
 }
 
 resource "linode_instance" "registry" {
-    count = 1
-    label = "${var.corral_user_id}-${random_id.registry_id.hex}-registry"
+    count = 3
+    label = "${var.corral_user_id}-${random_id.registry_id.hex}-registry-${count.index}"
     image = "linode/ubuntu20.04"
     region = "us-east"
     type = "g6-standard-4"
@@ -65,6 +65,7 @@ resource "linode_instance" "registry" {
 
   provisioner "remote-exec" {
    inline = [
+       "hostnamectl set-hostname ${var.corral_user_id}-${random_id.registry_id.hex}-registry-${count.index}",
        "wget https://releases.rancher.com/install-docker/${var.docker_version}.sh",
        "chmod +x ${var.docker_version}.sh",
        "bash ${var.docker_version}.sh",
@@ -73,12 +74,28 @@ resource "linode_instance" "registry" {
   }
 }
 
-resource "aws_route53_record" "registry" {
+resource "aws_route53_record" "registry-global" {
   zone_id = var.aws_zone_id
-  name    = "${var.corral_user_id}-${random_id.registry_id.hex}.${var.aws_domain}"
+  name    = "${var.corral_user_id}-registry-global.${var.aws_domain}"
   type    = "A"
   ttl     = "10"
   records = [linode_instance.registry[0].ip_address]
+}
+
+resource "aws_route53_record" "registry-cluster-auth" {
+  zone_id = var.aws_zone_id
+  name    = "${var.corral_user_id}-registry-auth.${var.aws_domain}"
+  type    = "A"
+  ttl     = "10"
+  records = [linode_instance.registry[1].ip_address]
+}
+
+resource "aws_route53_record" "registry-cluster-noauth" {
+  zone_id = var.aws_zone_id
+  name    = "${var.corral_user_id}-registry-noauth.${var.aws_domain}"
+  type    = "A"
+  ttl     = "10"
+  records = [linode_instance.registry[2].ip_address]
 }
 
 resource "linode_instance" "rancher" {

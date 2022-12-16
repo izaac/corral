@@ -9,7 +9,6 @@ variable "linode_token" {}
 variable "aws_zone_id" {}
 variable "aws_domain" {}
 variable "linode_root_password" {}
-variable "registry_auth" {}
 variable "ssh_authorized_key" {}
 variable "docker_version" {}
 variable "rancher_password" {}

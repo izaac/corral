@@ -11,14 +11,21 @@ function corral_log() {
     echo "corral_log $1"
 }
 
-corral_log "Build started for registry $CORRAL_registry_host"
+corral_log "Build started for registry"
 echo "$CORRAL_corral_user_public_key" >> "$HOME"/.ssh/authorized_keys
 echo "$CORRAL_valid_cert" | base64 -d > /opt/basic-registry/nginx_config/domain.crt
 echo "$CORRAL_valid_key" | base64 -d > /opt/basic-registry/nginx_config/domain.key
 
+GLOBAL="$CORRAL_registry_global_host"
+AUTH="$CORRAL_registry_auth_host"
+NOAUTH="$CORRAL_registry_noauth_host"
+
+HOSTNAME=$(hostname)
+corral_log "HOSTNAME: $HOSTNAME"
+
 corral_log "Downloading Dependencies"
 
-if [ "True" = "$CORRAL_registry_auth" ]; then
+if [[ "$HOSTNAME" == *"-registry-1"* ]] ; then
     corral_log "Building registry with auth"
     
     USERNAME="corral"
@@ -29,7 +36,7 @@ if [ "True" = "$CORRAL_registry_auth" ]; then
 
     htpasswd -Bbn "$USERNAME" "$PASSWORD" > /opt/basic-registry/nginx_config/registry.password
 else
-    corral_log "Building no auth registry"
+    corral_log "Building no auth registries global and cluster"
 
     sed -i -e 's/auth_basic/#auth_basic/g' /opt/basic-registry/nginx_config/nginx.conf
     sed -i -e 's/add_header/#add_header/g' /opt/basic-registry/nginx_config/nginx.conf
@@ -54,18 +61,28 @@ corral_log "Saving images to host. Estimated time 1hr"
 
 bash rancher-save-images.sh --image-list rancher-images.txt
 
-if [ "True" = "$CORRAL_registry_auth" ]; then
+if [[ "$HOSTNAME" == *"-registry-1"* ]]; then
     corral_log "Login to the registry to load images"
 
-    docker login -u "$USERNAME" -p "$PASSWORD" "$CORRAL_registry_host"
+    docker login -u "$USERNAME" -p "$PASSWORD" "$AUTH"
 else
     corral_log "No login needed to load images"
 fi
 
 corral_log "Loading images to registry. Estimated time 1hr"
 
-bash rancher-load-images.sh --image-list rancher-images.txt --registry "$CORRAL_registry_host"
 
-corral_log "Registry username: $USERNAME"
-corral_log "Registry password: $PASSWORD"
-corral_log "Registry Host: $CORRAL_registry_host"
+if [[ "$HOSTNAME" == *"-registry-1"* ]]; then
+    bash rancher-load-images.sh --image-list rancher-images.txt --registry "$AUTH"
+    corral_log "Registry auth username: $USERNAME"
+    corral_log "Registry auth password: $PASSWORD"
+    corral_log "Registry auth Host: $AUTH"
+fi
+if [[ "$HOSTNAME" == *"-registry-0"* ]]; then
+    bash rancher-load-images.sh --image-list rancher-images.txt --registry "$GLOBAL"
+    corral_log "Registry Global no auth Host: $GLOBAL"
+fi
+if [[ "$HOSTNAME" == *"-registry-2"* ]]; then
+    bash rancher-load-images.sh --image-list rancher-images.txt --registry "$NOAUTH"
+    corral_log "Registry no auth Host $NOAUTH"
+fi
