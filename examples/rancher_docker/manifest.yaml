@@ -1,0 +1,47 @@
+name: registry
+description: |
+  An authenticated docker registry running in Linode.
+variables:
+  linode_token:
+    sensitive: true
+    type: string
+    optional: false
+    description: "A Linode API token with write permission."
+  linode_root_password:
+    sensitive: true
+    type: string
+    optional: false
+    description: "The Linodes default root password"
+  aws_zone_id:
+    sensitive: true
+    type: string
+    optional: false
+    description: "The domain Route53 zone id"
+  aws_domain:
+    sensitive: true
+    type: string
+    optional: false
+    description: "The domain to use for the registry host."
+  rancher_version:
+    type: string
+    optional: false
+    description: "Rancher version that the registry is for"
+  rancher_password:
+    type: string
+    optional: false
+    description: "Rancher password after bootstrap"
+  ssh_authorized_key:
+    type: string
+    optional: true
+    description: "the public ssh key to copy to the nodes for remote access"
+  docker_version:
+    type: string
+    optional: false
+    default: "20.10"
+    description: "docker version to use for the Rancher install"
+commands:
+  - module: bootstrap
+  - module: rancher
+  - command: /opt/corral/rancher-info.sh
+    node_pools:
+      - rancher
